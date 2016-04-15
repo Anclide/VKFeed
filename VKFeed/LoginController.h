@@ -1,5 +1,5 @@
 //
-//  ViewController.h
+//  LoginController.h
 //  VKFeed
 //
 //  Created by Victor Bogatyrev on 13.04.16.
@@ -8,8 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController
-
+@interface LoginController : UIViewController
 
 @end
-

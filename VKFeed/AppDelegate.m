@@ -8,6 +8,8 @@
 
 #import "AppDelegate.h"
 
+static NSString *token;
+
 @interface AppDelegate ()
 
 @end
