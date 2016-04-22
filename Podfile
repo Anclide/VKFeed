@@ -6,7 +6,6 @@
 target 'VKFeed' do
 
 pod 'AFNetworking'
-pod 'NXOAuth2Client'
 
 end
 

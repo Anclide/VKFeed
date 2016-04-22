@@ -13,5 +13,8 @@
 
 + (NetManager *)sharedManager;
 
+- (void)logout:(UIViewController *)sender;
+
+- (void)loadPosts;
 
 @end

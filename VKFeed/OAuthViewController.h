@@ -1,5 +1,5 @@
 //
-//  NewsController.h
+//  OAuthViewController.h
 //  VKFeed
 //
 //  Created by Victor Bogatyrev on 21.04.16.
@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface NewsController : UITableViewController
+@interface OAuthViewController : UIViewController
 
 @end

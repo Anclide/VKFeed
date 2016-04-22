@@ -9,8 +9,10 @@
 /* Begin PBXBuildFile section */
 		7D1585941CBEB1E900361F3C /* NetManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D1585931CBEB1E900361F3C /* NetManager.m */; };
 		7D1585971CBEB48E00361F3C /* LoginController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D1585961CBEB48E00361F3C /* LoginController.m */; };
-		7D15859A1CBF6D7700361F3C /* NewsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D1585991CBF6D7700361F3C /* NewsController.m */; };
 		7D15859D1CBF6D8A00361F3C /* DetailController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D15859C1CBF6D8A00361F3C /* DetailController.m */; };
+		7D6F29701CC90DD5005B6344 /* OAuthViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D6F296F1CC90DD5005B6344 /* OAuthViewController.m */; };
+		7D6F29731CC9559B005B6344 /* NewsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D6F29721CC9559B005B6344 /* NewsController.m */; };
+		7D6F29771CCA39F0005B6344 /* FeedMapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D6F29761CCA39F0005B6344 /* FeedMapper.m */; };
 		7DB90A2A1CBE68F4008B9AE0 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DB90A291CBE68F4008B9AE0 /* main.m */; };
 		7DB90A2D1CBE68F4008B9AE0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DB90A2C1CBE68F4008B9AE0 /* AppDelegate.m */; };
 		7DB90A331CBE68F4008B9AE0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7DB90A311CBE68F4008B9AE0 /* Main.storyboard */; };
@@ -46,10 +48,14 @@
 		7D1585931CBEB1E900361F3C /* NetManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NetManager.m; sourceTree = "<group>"; };
 		7D1585951CBEB48E00361F3C /* LoginController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginController.h; sourceTree = "<group>"; };
 		7D1585961CBEB48E00361F3C /* LoginController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginController.m; sourceTree = "<group>"; };
-		7D1585981CBF6D7700361F3C /* NewsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewsController.h; sourceTree = "<group>"; };
-		7D1585991CBF6D7700361F3C /* NewsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewsController.m; sourceTree = "<group>"; };
 		7D15859B1CBF6D8A00361F3C /* DetailController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DetailController.h; sourceTree = "<group>"; };
 		7D15859C1CBF6D8A00361F3C /* DetailController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DetailController.m; sourceTree = "<group>"; };
+		7D6F296E1CC90DD5005B6344 /* OAuthViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OAuthViewController.h; sourceTree = "<group>"; };
+		7D6F296F1CC90DD5005B6344 /* OAuthViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OAuthViewController.m; sourceTree = "<group>"; };
+		7D6F29711CC9559B005B6344 /* NewsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewsController.h; sourceTree = "<group>"; };
+		7D6F29721CC9559B005B6344 /* NewsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewsController.m; sourceTree = "<group>"; };
+		7D6F29751CCA39F0005B6344 /* FeedMapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FeedMapper.h; sourceTree = "<group>"; };
+		7D6F29761CCA39F0005B6344 /* FeedMapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FeedMapper.m; sourceTree = "<group>"; };
 		7DB90A251CBE68F4008B9AE0 /* VKFeed.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VKFeed.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7DB90A291CBE68F4008B9AE0 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		7DB90A2B1CBE68F4008B9AE0 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -109,6 +115,15 @@
 				7E434685429B375D6D3158AC /* Pods-VKFeed.release.xcconfig */,
 			);
 			name = Pods;
+			sourceTree = "<group>";
+		};
+		7D6F29741CCA39D1005B6344 /* Mappers */ = {
+			isa = PBXGroup;
+			children = (
+				7D6F29751CCA39F0005B6344 /* FeedMapper.h */,
+				7D6F29761CCA39F0005B6344 /* FeedMapper.m */,
+			);
+			name = Mappers;
 			sourceTree = "<group>";
 		};
 		7DB90A1C1CBE68F4008B9AE0 = {
@@ -176,6 +191,7 @@
 		7DB90A5E1CBE6A5A008B9AE0 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				7D6F29741CCA39D1005B6344 /* Mappers */,
 				7D1585921CBEB1E900361F3C /* NetManager.h */,
 				7D1585931CBEB1E900361F3C /* NetManager.m */,
 			);
@@ -198,10 +214,12 @@
 			children = (
 				7D1585951CBEB48E00361F3C /* LoginController.h */,
 				7D1585961CBEB48E00361F3C /* LoginController.m */,
-				7D1585981CBF6D7700361F3C /* NewsController.h */,
-				7D1585991CBF6D7700361F3C /* NewsController.m */,
 				7D15859B1CBF6D8A00361F3C /* DetailController.h */,
 				7D15859C1CBF6D8A00361F3C /* DetailController.m */,
+				7D6F296E1CC90DD5005B6344 /* OAuthViewController.h */,
+				7D6F296F1CC90DD5005B6344 /* OAuthViewController.m */,
+				7D6F29711CC9559B005B6344 /* NewsController.h */,
+				7D6F29721CC9559B005B6344 /* NewsController.m */,
 			);
 			name = Controller;
 			sourceTree = "<group>";
@@ -387,13 +405,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7D6F29701CC90DD5005B6344 /* OAuthViewController.m in Sources */,
 				7DB90A361CBE68F4008B9AE0 /* VKFeed.xcdatamodeld in Sources */,
 				7D1585941CBEB1E900361F3C /* NetManager.m in Sources */,
 				7DB90A2D1CBE68F4008B9AE0 /* AppDelegate.m in Sources */,
+				7D6F29731CC9559B005B6344 /* NewsController.m in Sources */,
 				7D15859D1CBF6D8A00361F3C /* DetailController.m in Sources */,
 				7DB90A2A1CBE68F4008B9AE0 /* main.m in Sources */,
+				7D6F29771CCA39F0005B6344 /* FeedMapper.m in Sources */,
 				7D1585971CBEB48E00361F3C /* LoginController.m in Sources */,
-				7D15859A1CBF6D7700361F3C /* NewsController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

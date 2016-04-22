@@ -8,9 +8,6 @@
 
 #import "NetManager.h"
 
-
-static NSString *accessToken;
-
 @interface NetManager () <UIWebViewDelegate>
 
 @end
@@ -22,8 +19,38 @@ static NSString *accessToken;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         _sharedNetManager = [[self alloc] initWithBaseURL:nil];
+        AFJSONResponseSerializer *responeSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:NSJSONReadingAllowFragments];
+        [_sharedNetManager setResponseSerializer:responeSerializer];
     });
     return _sharedNetManager;
+}
+
+- (void)logout:(UIViewController *)sender {
+   
+}
+
+- (void)loadPosts {
+    
+    NSString *token = [[NSUserDefaults standardUserDefaults] objectForKey:@"access_token"];
+    NSString *url = [NSString stringWithFormat:@"https://api.vk.com/method/newsfeed.get?access_token=%@&count=10", token];
+    
+    NSString *testUrl = @"https://api.vk.com/method/newsfeed.get";
+    
+    NSDictionary *params = @{
+                             @"access_token":token,
+                             @"count":@"10"
+                             };
+    
+        [self GET:testUrl parameters:params progress:nil success:^(NSURLSessionDataTask *task, id responseObject) {
+            NSLog(@"%@", responseObject);
+            if ([responseObject[@"response"] isKindOfClass:[NSArray class]]) {
+                NSArray *array = responseObject[@"response"];
+                NSLog(@"%@", array);
+                NSLog(@"%@", task.currentRequest.URL);
+            }
+        } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+            NSLog(@"%@", error);
+        }];
 }
 
 @end

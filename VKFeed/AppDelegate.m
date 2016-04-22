@@ -6,9 +6,8 @@
 //  Copyright © 2016 Victor Bogatyrev. All rights reserved.
 //
 
-#import "AppDelegate.h"
 
-static NSString *token;
+#import "AppDelegate.h"
 
 @interface AppDelegate ()
 
@@ -16,9 +15,8 @@ static NSString *token;
 
 @implementation AppDelegate
 
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    // Override point for customization after application launch.
+        // Override point for customization after application launch.
     return YES;
 }
 
