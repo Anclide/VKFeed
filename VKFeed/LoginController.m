@@ -7,6 +7,8 @@
 //
 
 #import "LoginController.h"
+#import <CoreData/CoreData.h>
+#import "AppDelegate.h"
 
 @interface LoginController ()
 
@@ -18,6 +20,16 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+//    AppDelegate *ap = [[UIApplication sharedApplication] delegate];
+//    NSManagedObjectContext *moc = [ap managedObjectContext];
+//    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"Item"];
+//    [fetchRequest setReturnsObjectsAsFaults:NO];
+//    NSArray *array = [[moc executeFetchRequest:fetchRequest error:nil] mutableCopy];
+//    if (array.count > 0) {
+//        NSLog(@"%@", array);
+//    } else {
+//        NSLog(@"no data");
+//    }
     // Do any additional setup after loading the view.
 }
 

@@ -6,6 +6,7 @@
 target 'VKFeed' do
 
 pod 'AFNetworking'
+pod 'SDWebImage'
 
 end
 

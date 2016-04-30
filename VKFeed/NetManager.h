@@ -15,6 +15,6 @@
 
 - (void)logout:(UIViewController *)sender;
 
-- (void)loadPosts;
+- (void)loadPostsFromBeggining:(BOOL)from;
 
 @end

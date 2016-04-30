@@ -20,7 +20,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     _loginView.delegate = self;
-    NSString *url = [NSString stringWithFormat:@"https://oauth.vk.com/authorize?client_id=%@&display=mobile&redirect_uri=https://oauth.vk.com/blank.html&scope=wall,friends,offline&response_type=token&v=5.50", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"APP_ID"]];
+    NSString *url = [NSString stringWithFormat:@"https://oauth.vk.com/authorize?client_id=%@&display=mobile&redirect_uri=https://oauth.vk.com/blank.html&scope=wall,offline,friends&response_type=token&v=5.50", [[NSBundle mainBundle] objectForInfoDictionaryKey:@"APP_ID"]];
     NSURL *address = [NSURL URLWithString:url];
     NSURLRequest *request = [NSURLRequest requestWithURL:address];
     [_loginView loadRequest:request];
