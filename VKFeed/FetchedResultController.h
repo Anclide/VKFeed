@@ -14,5 +14,7 @@
 
 + (NSArray *)getPosts;
 
++ (NSArray *)getPostPhotosWithPostId:(NSNumber *)postId;
+
 
 @end

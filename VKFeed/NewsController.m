@@ -18,24 +18,28 @@
 #import "ImageCell.h"
 #import "TextCell.h"
 #import <SDWebImage/UIImageView+WebCache.h>
+#import "DetailController.h"
+#import "CollectionPost.h"
+
+
+static BOOL needToScrool = YES;
+
 
 @interface NewsController ()
-
-@property (nonatomic, strong) NSArray *posts;
+{
+    NSArray *posts;
+}
+@property (strong, nonatomic) CollectionPost *detailPost;
 
 @end
 
 @implementation NewsController
 
-@synthesize posts = _posts;
-
 - (void)viewDidLoad {
     [super viewDidLoad];
-    //_posts = [FetchedResultController getPosts];
-    //NSLog(@"_posts: %@", _posts);
+    [self reloadData];
     
     UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
-    refreshControl.attributedTitle = [[NSAttributedString alloc] initWithString:@""];
     [refreshControl addTarget:self action:@selector(refresh:) forControlEvents:UIControlEventValueChanged];
     [self.tableView addSubview:refreshControl];
     [refreshControl.superview sendSubviewToBack:refreshControl];
@@ -52,28 +56,27 @@
     [self.tableView registerNib:[UINib nibWithNibName:@"TextCell" bundle:nil] forCellReuseIdentifier:@"text_cell"];
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    NSLog(@"posts after loading: %lu", (unsigned long)posts.count);
+}
+
 - (void)refresh:(UIRefreshControl *)refrshControl {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [[NetManager sharedManager] loadPostsFromBeggining:YES];
-    });
     [self reloadData];
     [refrshControl endRefreshing];
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [[NetManager sharedManager] loadPostsFromBeggining:YES];
-    });
-    [self reloadData];
-}
-
 - (void)reloadData {
-    _posts = [FetchedResultController getPosts];
-    [self.tableView reloadData];
+    [[NetManager sharedManager] loadPostsFromBeggining:YES withCompletion:^(NSArray *array, NSError *error) {
+        posts = array;
+        if (posts.count == 0) {
+            posts = [FetchedResultController getPosts];
+        }
+        [self.tableView reloadData];
+    }];
 }
 
 - (BOOL)hasImageAtIndexPath:(NSIndexPath *)indexPath {
-    Post *post = _posts[indexPath.section];
+    Post *post = posts[indexPath.section];
     if (post.itemImageUrl != nil) {
         return YES;
     } else {
@@ -82,18 +85,29 @@
 }
 
 - (BOOL)hasTextAtIndexPath:(NSIndexPath *)indexPath {
-     Post *post = _posts[indexPath.section];
-    if (post.text != nil) {
-        return YES;
-    } else {
+     Post *post = posts[indexPath.section];
+    if (post.text == nil || [post.text isEqualToString:@""]) {
         return NO;
+    } else {
+        return YES;
     }
+}
+
+- (NSString *)changeDateFormat:(NSDate *)date {
+    NSString *formattedDate;
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    NSLocale *locale = [[NSLocale alloc] initWithLocaleIdentifier:@"RU"];
+    [dateFormatter setLocale:locale];
+    [dateFormatter setDateFormat:@"dd.MM.yyyy HH:mm"];
+    formattedDate = [dateFormatter stringFromDate:date];
+    
+    return formattedDate;
 }
 
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return _posts.count;
+    return posts.count;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -114,7 +128,7 @@
 
 - (TextCell *)textCellAtIndexPath:(NSIndexPath *)indexPath {
     TextCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"text_cell"];
-    Post *post = _posts[indexPath.section];
+    Post *post = posts[indexPath.section];
     cell.text.text = [self htmlTextToPlain:post.text];
     
     return cell;
@@ -122,11 +136,13 @@
 
 - (ImageCell *)imageCellAtIndexPath:(NSIndexPath *)indexPath {
     ImageCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"image_cell"];
-    Post *post = _posts[indexPath.section];
+    Post *post = posts[indexPath.section];
     cell.customImageView.contentMode = UIViewContentModeCenter;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSLog(@"image_image: %@", post.bigItemImageUrl);
         [cell.customImageView sd_setImageWithURL:[NSURL URLWithString:post.bigItemImageUrl] placeholderImage:nil];
     });
+
     NSLayoutConstraint *aspectRatio = [NSLayoutConstraint constraintWithItem:cell.customImageView
                                                                    attribute:NSLayoutAttributeHeight
                                                                    relatedBy:NSLayoutRelationEqual
@@ -143,9 +159,10 @@
 
 - (CustomCell *)customCellAtIndexPath:(NSIndexPath *)indexPath {
     CustomCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"custom_cell"];
-    Post *post = _posts[indexPath.section];
+    Post *post = posts[indexPath.section];
     cell.text.text = [self htmlTextToPlain:post.text];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+    NSLog(@"custom_image: %@", post.bigItemImageUrl);
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         [cell.customImageView sd_setImageWithURL:[NSURL URLWithString:post.bigItemImageUrl] placeholderImage:nil];
     });
     NSLayoutConstraint *aspectRatio = [NSLayoutConstraint constraintWithItem:cell.customImageView
@@ -159,6 +176,7 @@
     [cell.customImageView addConstraint:aspectRatio];
     [cell layoutIfNeeded];
     [cell layoutSubviews];
+    [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
     
     return cell;
 }
@@ -172,24 +190,30 @@
     return [string string];
 }
 
-//- (void)setTextForCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
-//    
-//}
-//
-//- (void)setImageForCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
-//    
-//}
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    Post *post = posts[indexPath.section];
+    _detailPost = [[CollectionPost alloc] init];
+    _detailPost.postId = post.postId;
+    _detailPost.photos = [FetchedResultController getPostPhotosWithPostId:post.postId];
+    _detailPost.postDate = post.date;
+    _detailPost.authorName = post.authorName;
+    _detailPost.authorImageUrl = post.authorImageUrl;
+    _detailPost.text = post.text;
+    
+    [self performSegueWithIdentifier:@"detail_segue" sender:self];
+}
 
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    Post *post = [_posts objectAtIndex:indexPath.section];
+    Post *post = [posts objectAtIndex:indexPath.section];
     if (indexPath.row == 0) {
         AuthorCell *authorCell = [tableView dequeueReusableCellWithIdentifier:@"author_cell" forIndexPath:indexPath];
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             [authorCell.authorImage sd_setImageWithURL:[NSURL URLWithString:post.authorImageUrl] placeholderImage:nil];
         });
         authorCell.authorName.text = post.authorName;
+        authorCell.dateLabel.text = [self changeDateFormat:post.date];
         return authorCell;
     } else if (indexPath.row == 1) {
         if ([self hasTextAtIndexPath:indexPath] && [self hasImageAtIndexPath:indexPath]) {
@@ -205,6 +229,25 @@
         otherCell.likesLabel.text = [NSString stringWithFormat:@"Likes: %@", [post.likes stringValue]];
         otherCell.repostsLabel.text = [NSString stringWithFormat:@"Reposts: %@", [post.reposts stringValue]];
         return otherCell;
+    }
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    CGFloat currentOffset = scrollView.contentOffset.y;
+    //NSLog(@"current_offset: %f", currentOffset);
+    CGFloat maximumHeigth = scrollView.contentSize.height - scrollView.frame.size.height;
+    //NSLog(@"maximumHeight: %f", maximumHeigth);
+    if (currentOffset > 0 && currentOffset >= maximumHeigth) {
+        if (needToScrool) {
+            needToScrool = NO;
+            [[NetManager sharedManager] loadPostsFromBeggining:NO withCompletion:^(NSArray *array, NSError *error) {
+                posts = array;
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                    [self.tableView reloadData];
+                });
+                needToScrool = YES;
+            }];
+        }
     }
 }
 
@@ -243,14 +286,17 @@
 }
 */
 
-/*
+
 #pragma mark - Navigation
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+    if ([segue.identifier isEqualToString:@"detail_segue"]) {
+        DetailController *detail = [segue destinationViewController];
+        detail.post = _detailPost;
+    }
+    _detailPost = nil;
 }
-*/
+
 
 @end

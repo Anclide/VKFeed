@@ -27,13 +27,15 @@
     NSError *error = nil;
     NSArray *reqestResult = [[moc executeFetchRequest:fetchRequest error:&error] mutableCopy];
     if (reqestResult) {
-        NSLog(@"count: %lu", (unsigned long)reqestResult.count);
+        //NSLog(@"count: %lu", (unsigned long)reqestResult.count);
         for (Item *item in reqestResult) {
             //NSLog(@"item: %@", item);
             Post *post = [[Post alloc] init];
+            post.date = [NSDate dateWithTimeIntervalSince1970:[item.date doubleValue]];
             post.text = item.text;
             post.likes = item.likes;
             post.reposts = item.reposts;
+            post.postId = item.postId;
             for (Photo *photo in item.item.allObjects) {
                 //NSLog(@"photo: %@", photo);
                 post.itemImageUrl = photo.src;
@@ -41,7 +43,7 @@
                 post.imageWidth = photo.width;
                 post.imageHeight = photo.height;
             }
-            NSLog(@"source: %@ and class: %@", item.sourceId, [item.sourceId class]);
+            //NSLog(@"source: %@ and class: %@", item.sourceId, [item.sourceId class]);
             if ([item.sourceId integerValue] < 0) {
                 NSString *str = [item.sourceId stringValue];
                 str = [str substringFromIndex:1];
@@ -65,10 +67,36 @@
             [array addObject:post];
             
         }
-    } else {
-        NSLog(@"no data");
     }
     return [array mutableCopy];
+}
+
++ (NSArray *)getPostPhotosWithPostId:(NSNumber *)postId {
+    NSMutableArray *array = [[NSMutableArray alloc] init];
+    AppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+    NSManagedObjectContext *moc = [appDelegate managedObjectContext];
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Item" inManagedObjectContext:moc];
+    [fetchRequest setEntity:entity];
+    [fetchRequest setReturnsObjectsAsFaults:NO];
+    // Specify criteria for filtering which objects to fetch
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"postId = %@", postId];
+    [fetchRequest setPredicate:predicate];
+    NSError *error = nil;
+    NSArray *fetchedObjects = [[moc executeFetchRequest:fetchRequest error:&error] mutableCopy];
+    for (Item *item in fetchedObjects) {
+       for (Photo *photo in item.item.allObjects) {
+           NSLog(@"photo: %@", photo.postId);
+           [array addObject:photo];
+       }
+    }
+    NSLog(@"fetch %@", array);
+    if (fetchedObjects == nil) {
+        NSLog(@"failed to load photos");
+    }
+    return array;
+        
+    
 }
 
 @end

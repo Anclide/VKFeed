@@ -22,17 +22,17 @@
     NSError *error = nil;
     for (NSDictionary *dict in [respone objectForKey:@"groups"]) {
         NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:@"Group"];
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"gid = %@", dict[@"gid"]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"gid = %@", dict[@"id"]];
         [fetchRequest setPredicate:predicate];
         NSUInteger count = [moc countForFetchRequest:fetchRequest error:&error];
         if (count == 0) {
             Group *group = [NSEntityDescription insertNewObjectForEntityForName:@"Group" inManagedObjectContext:moc];
-            [group setGid:dict[@"gid"]];
+            [group setGid:dict[@"id"]];
             [group setName:dict[@"name"]];
-            if (dict[@"photo"] == 0) {
-                [group setPhotoUrl:@"http://vk.com/images/camera_a.gif"];
+            if (dict[@"photo_100"] == 0) {
+                [group setPhotoUrl:dict[@"photo_50"]];
             } else {
-                [group setPhotoUrl:dict[@"photo_medium"]];
+                [group setPhotoUrl:dict[@"photo_100"]];
             }
             if (![moc save:&error])
             {
@@ -55,32 +55,32 @@
             [item setLikes:dict[@"likes"][@"count"]];
             [item setReposts:dict[@"reposts"][@"count"]];
             [item setSourceId:dict[@"source_id"]];
-                if ([dict[@"attachment"] objectForKey:@"photo"]) {
-                    NSFetchRequest *req = [[NSFetchRequest alloc] initWithEntityName:@"Photo"];
-                    NSPredicate *imagePredicate = [NSPredicate predicateWithFormat:@"src = %@", dict[@"src"]];
-                    [req setPredicate:imagePredicate];
-                    NSUInteger imageCount = [moc countForFetchRequest:req error:&error];
-                    if (imageCount == 0) {
-                        Photo *photo = [NSEntityDescription insertNewObjectForEntityForName:@"Photo"
-                                                                     inManagedObjectContext:moc];
-                        [photo setPostId:dict[@"post_id"]];
-                        [photo setSrc:dict[@"attachment"][@"photo"][@"src"]];
-                        [photo setSrc_big:dict[@"attachment"][@"photo"][@"src_big"]];
-                        [photo setSrc_small:dict[@"attachment"][@"photo"][@"src_small"]];
-                        [photo setWidth:dict[@"attachment"][@"photo"][@"width"]];
-                        [photo setHeight:dict[@"attachment"][@"photo"][@"height"]];
-                        [item addItemObject:photo];
-                        if (![moc save:&error])
-                        {
-                            NSLog(@"Save did not complete successfully. Error: %@",
-                                  [error localizedDescription]);
+                if (dict[@"attachments"]) {
+                    for (NSDictionary *attachment in dict[@"attachments"]) {
+                        if ([attachment[@"type"] isEqualToString:@"photo"]) {
+                            NSFetchRequest *req = [[NSFetchRequest alloc] initWithEntityName:@"Photo"];
+                            NSPredicate *imagePredicate = [NSPredicate predicateWithFormat:@"src = %@", attachment[@"photo"][@"photo_130"]];
+                            [req setPredicate:imagePredicate];
+                            NSUInteger imageCount = [moc countForFetchRequest:req error:&error];
+                            if (imageCount == 0) {
+                                Photo *photo = [NSEntityDescription insertNewObjectForEntityForName:@"Photo"
+                                                                             inManagedObjectContext:moc];
+                                [photo setPostId:dict[@"post_id"]];
+                                [photo setSrc:attachment[@"photo"][@"photo_130"]];
+                                [photo setSrc_big:attachment[@"photo"][@"photo_604"]];
+                                [photo setSrc_small:attachment[@"photo"][@"photo_75"]];
+                                [photo setWidth:attachment[@"photo"][@"width"]];
+                                [photo setHeight:attachment[@"photo"][@"height"]];
+                                [item addItemObject:photo];
+                            }
                         }
                     }
-                    
                 }
-                
-            
-            
+            if (![moc save:&error])
+            {
+                NSLog(@"Save did not complete successfully. Error: %@",
+                      [error localizedDescription]);
+            }
             if (![moc save:&error])
             {
                 NSLog(@"Save did not complete successfully. Error: %@",
@@ -92,16 +92,16 @@
     if (respone[@"profiles"]) {
         for (NSDictionary *dict in respone[@"profiles"]) {
             NSFetchRequest *request = [[NSFetchRequest alloc] initWithEntityName:@"Profile"];
-            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userId = %@", dict[@"uid"]];
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userId = %@", dict[@"id"]];
             [request setPredicate:predicate];
             NSUInteger count = [moc countForFetchRequest:request error:&error];
             if (count == 0) {
                 Profile *profile = [NSEntityDescription insertNewObjectForEntityForName:@"Profile"
                                                                  inManagedObjectContext:moc];
-                [profile setUserId:dict[@"uid"]];
+                [profile setUserId:dict[@"id"]];
                 [profile setFirstName:dict[@"first_name"]];
                 [profile setLastName:dict[@"last_name"]];
-                [profile setImageUrl:dict[@"photo"]];
+                [profile setImageUrl:dict[@"photo_100"]];
                 
                 if (![moc save:&error])
                 {

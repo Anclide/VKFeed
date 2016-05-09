@@ -14,7 +14,6 @@
 
 @property (nonatomic, weak) IBOutlet UILabel *authorName;
 
-@property (nonatomic, strong) NSString *imageUrl;
-@property (nonatomic, strong) NSString *name;
+@property (nonatomic, weak) IBOutlet UILabel *dateLabel;
 
 @end

@@ -10,6 +10,8 @@
 
 @interface Post : NSObject
 
+@property (nonatomic, strong) NSNumber *postId;
+
 @property (nonatomic, strong) NSString *authorName;
 
 @property (nonatomic, strong) NSString *authorImageUrl;
@@ -27,5 +29,7 @@
 @property (nonatomic, strong) NSNumber *reposts;
 
 @property (nonatomic, strong) NSString *bigItemImageUrl;
+
+@property (nonatomic, strong) NSDate *date;
 
 @end

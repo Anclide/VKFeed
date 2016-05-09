@@ -9,6 +9,9 @@
 #import "NetManager.h"
 #import "FeedMapper.h"
 #import "AppDelegate.h"
+#import "FetchedResultController.h"
+
+static BOOL isFirst = YES;
 
 @interface NetManager () <UIWebViewDelegate>
 
@@ -28,22 +31,23 @@
 }
 
 - (void)logout:(UIViewController *)sender {
-    NSString *url = @"https://oauth.vk.com/logout";
-    
-    NSDictionary *params = @{
-                             @"access_token":[[NSUserDefaults standardUserDefaults] objectForKey:@"access_token"]
-                             };
-    
-    [self GET:url parameters:params progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-        NSLog(@"logout complete");
-        [sender.navigationController popToRootViewControllerAnimated:YES];
-    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-        NSLog(@"%@", error);
-    }];
+    AppDelegate *ap = [[UIApplication sharedApplication] delegate];
+    [ap deleteAll];
+    [[NSURLCache sharedURLCache] removeAllCachedResponses];
+    for(NSHTTPCookie *cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]) {
+        [[NSHTTPCookieStorage sharedHTTPCookieStorage] deleteCookie:cookie];
+    }
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"access_token"];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Success" message:@"You successfully logged out" preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [sender dismissViewControllerAnimated:YES completion:nil];
+    }]];
+    [sender presentViewController:alert animated:YES completion:nil];
+
    
 }
 
-- (void)loadPostsFromBeggining:(BOOL)from {
+- (void)loadPostsFromBeggining:(BOOL)from withCompletion:(void(^)(NSArray *, NSError *))completion{
     
     NSString *token = [[NSUserDefaults standardUserDefaults] objectForKey:@"access_token"];
     
@@ -52,38 +56,40 @@
     NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
     
     NSNumber *date = [[NSUserDefaults standardUserDefaults] objectForKey:@"end_date"];
+    
+    NSString *startFrom = [NSString stringWithFormat:@"%@", [[NSUserDefaults standardUserDefaults] objectForKey:@"start_from"]];
+    
+    
 
     [params setObject:token forKey:@"access_token"];
     [params setObject:@"post" forKey:@"filter"];
+    [params setObject:@"5.52" forKey:@"v"];
     if (from) {
-        [params setObject:@"100" forKey:@"count"];
         if (date) {
-            [params setObject:date forKey:@"end_date"];
+            [params setObject:date forKey:@"end_time"];
+        } else {
+             [params setObject:@"10" forKey:@"count"];
         }
-    } else {
-        [params setObject:@"10" forKey:@"count"];
-        [params setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"start_from"]  forKey:@"start_from"];
+    } else if (startFrom.length > 5){
+        //NSLog(@"start_from: %@", [[NSUserDefaults standardUserDefaults] objectForKey:@"start_from"]);
+        [params setObject:startFrom  forKey:@"start_from"];
         
     }
     
-        [self GET:url parameters:params progress:nil success:^(NSURLSessionDataTask *task, id responseObject) {
-//            NSLog(@"response class:%@", [responseObject class]);
-//            NSLog(@"inner response class:%@", [[responseObject objectForKey:@"response"] class]);
-//            NSLog(@"groups response class:%@", [[responseObject[@"response"] objectForKey:@"groups"] class]);
-//            NSLog(@"new_offset response class:%@", [[responseObject[@"response"] objectForKey:@"new_offset"] class]);
-//            NSLog(@"resposne count: %lu", [[responseObject[@"response"] objectForKey:@"Items"] count]);
-            if ([[responseObject[@"response"] objectForKey:@"Items"] count] > 20) {
-                AppDelegate *ap = [[UIApplication sharedApplication] delegate];
-                [ap deleteAll];
-            }
-            NSLog(@"%@", responseObject);
-            [[NSUserDefaults standardUserDefaults] setObject:[responseObject[@"response"] objectForKey:@"new_offset"]  forKey:@"new_offset"];
-            [[NSUserDefaults standardUserDefaults] setObject:[responseObject[@"response"] objectForKey:@"new_from"] forKey:@"start_from"];
-            [[NSUserDefaults standardUserDefaults] setObject:[[[responseObject[@"response"] objectForKey:@"Items"] objectAtIndex:0] objectForKey:@"date"]   forKey:@"end_date"];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-            [FeedMapper saveData:responseObject[@"response"]];
-            
-            
+    [self GET:url parameters:params progress:nil success:^(NSURLSessionDataTask *task, id responseObject) {
+        //NSLog(@"loaded: %@", responseObject[@"response"]);
+        if (!from || isFirst) {
+            [[NSUserDefaults standardUserDefaults] setObject:[responseObject[@"response"] objectForKey:@"next_from"] forKey:@"start_from"];
+            isFirst = NO;
+        }
+        [[NSUserDefaults standardUserDefaults] setObject:[[[responseObject[@"response"] objectForKey:@"Items"] objectAtIndex:0] objectForKey:@"date"]   forKey:@"end_date"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        [FeedMapper saveData:responseObject[@"response"]];
+        NSArray *array = [FetchedResultController getPosts];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completion(array, nil);
+        });
+        //NSLog(@"start_from: %@", [[NSUserDefaults standardUserDefaults] objectForKey:@"start_from"]);
         } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
             NSLog(@"%@", error);
         }];

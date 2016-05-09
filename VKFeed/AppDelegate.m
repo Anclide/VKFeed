@@ -46,18 +46,30 @@
 }
 
 - (void)deleteAll {
-    NSFetchRequest * allMovies = [[NSFetchRequest alloc] init];
+    NSFetchRequest *allMovies = [[NSFetchRequest alloc] init];
     [allMovies setEntity:[NSEntityDescription entityForName:@"Item" inManagedObjectContext:_managedObjectContext]];
-    [allMovies setIncludesPropertyValues:NO]; //only fetch the managedObjectID
+    [allMovies setIncludesPropertyValues:NO];
+    NSFetchRequest *allPhotos = [[NSFetchRequest alloc] init];
+    [allPhotos setEntity:[NSEntityDescription entityForName:@"Photo" inManagedObjectContext:_managedObjectContext]];
+    [allPhotos setIncludesPropertyValues:NO];
     
-    NSError * error = nil;
-    NSArray * movies = [_managedObjectContext executeFetchRequest:allMovies error:&error];
+    NSError *error = nil;
+    NSArray *movies = [_managedObjectContext executeFetchRequest:allMovies error:&error];
+    NSArray *photos = [_managedObjectContext executeFetchRequest:allPhotos error:&error];
     //error handling goes here
-    for (NSManagedObject * movie in movies) {
+    for (NSManagedObject *movie in movies) {
         [_managedObjectContext deleteObject:movie];
+    }
+    for (NSManagedObject *photo in photos) {
+        [_managedObjectContext deleteObject:photo];
     }
     NSError *saveError = nil;
     [_managedObjectContext save:&saveError];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"start_from"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"end_date"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    
 }
 
 #pragma mark - Core Data stack
