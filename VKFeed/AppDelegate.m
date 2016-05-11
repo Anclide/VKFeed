@@ -47,10 +47,10 @@
 
 - (void)deleteAll {
     NSFetchRequest *allMovies = [[NSFetchRequest alloc] init];
-    [allMovies setEntity:[NSEntityDescription entityForName:@"Item" inManagedObjectContext:_managedObjectContext]];
+    [allMovies setEntity:[NSEntityDescription entityForName:@"Item" inManagedObjectContext:[self managedObjectContext]]];
     [allMovies setIncludesPropertyValues:NO];
     NSFetchRequest *allPhotos = [[NSFetchRequest alloc] init];
-    [allPhotos setEntity:[NSEntityDescription entityForName:@"Photo" inManagedObjectContext:_managedObjectContext]];
+    [allPhotos setEntity:[NSEntityDescription entityForName:@"Photo" inManagedObjectContext:[self managedObjectContext]]];
     [allPhotos setIncludesPropertyValues:NO];
     
     NSError *error = nil;
@@ -68,7 +68,6 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"start_from"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"end_date"];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    
     
 }
 
